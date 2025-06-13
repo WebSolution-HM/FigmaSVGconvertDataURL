@@ -1,5 +1,5 @@
 {
-  "name": "figmaSvgEncoder",
+  "name": "🔄 SVG → Data URL 변환기",
   "id": "1514906210779912700",
   "api": "1.0.0",
   "main": "code.js",
