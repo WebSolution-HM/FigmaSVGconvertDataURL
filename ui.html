@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG to Data URL</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 8px;
+            background: linear-gradient(135deg, #06879e 0%, #0b5693 100%);
+            color: #2d3748;
+            font-size: 14px;
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .title {
+            font-weight: 700;
+            font-size: 22px;
+            margin-bottom: 16px;
+            color: #1a202c;
+            text-align: center;
+            background: linear-gradient(135deg,#06879e , #0b5693 );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2);
+        }
+        
+        .status {
+            margin-bottom: 16px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            font-weight: 400;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        
+        .action-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .status-inline {
+            margin: 0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #2c9f96, #2d5a5a);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(44, 159, 150, 0.3);
+        }
+        
+        .button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(44, 159, 150, 0.4);
+        }
+        
+        .button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(44, 159, 150, 0.3);
+        }
+        
+        .code-block {
+            margin: 12px 0;
+            padding: 12px;
+            background: #1a202c;
+            border: 1px solid #2d3748;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: 12px;
+            word-break: break-all;
+            max-height: 116px;
+            overflow-y: auto;
+            text-align: left;
+            cursor: pointer;
+            user-select: all;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .code-block:hover {
+            background: #2d3748;
+            border-color: #4a5568;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .code-block::before {
+            content: "클릭하여 복사";
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 10px;
+            color: #a0aec0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .code-block:hover::before {
+            opacity: 1;
+        }
+        
+        .label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: left;
+            color: #2d3748;
+            font-size: 15px;
+        }
+        
+        .section {
+            margin-bottom: 18px;
+        }
+        
+        .instruction {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 6px;
+            font-style: italic;
+            text-align: center;
+        }
+        
+        .node-info-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            text-align: center;
+            font-size: 13px;
+            color: #495057;
+            font-weight: 400;
+            box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.281) inset;
+        }
+        
+        .node-name {
+            font-weight: 600;
+        }
+        
+        #results {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 스크롤바 스타일링 */
+        .code-block::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .code-block::-webkit-scrollbar-track {
+            background: #2d3748;
+            border-radius: 3px;
+        }
+        
+        .code-block::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 3px;
+        }
+        
+        .code-block::-webkit-scrollbar-thumb:hover {
+            background: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">SVG → Data URL 변환</div>
+        <div id="nodeInfoBox" class="node-info-box" style="display:none;"></div>
+        <div id="status" class="status">
+            요소를 선택해주세요...
+        </div>
+        <div id="actionRow" class="action-row" style="display: none;">
+            <div id="statusInline" class="status-inline">✅ 변환 완료!</div>
+            <button id="copyBtn" class="button">클립보드에 복사</button>
+        </div>
+        <div id="results" style="display: none;">
+            <div class="section">
+                <div class="label">정리된 SVG:</div>
+                <div id="originalSvg" class="code-block" onclick="selectText(this)"></div>
+                <div class="instruction">클릭하면 텍스트가 선택됩니다 (Ctrl+C로 복사)</div>
+            </div>
+            <div class="section">
+                <div class="label">Data URL:</div>
+                <div id="dataUrl" class="code-block" onclick="selectText(this)"></div>
+                <div class="instruction">클릭하면 텍스트가 선택됩니다 (Ctrl+C로 복사)</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDataUrl = '';
+        
+        // 텍스트 선택 함수
+        function selectText(element) {
+            if (window.getSelection) {
+                const selection = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(element);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+        
+        // 메시지 받기
+        window.onmessage = (event) => {
+            const msg = event.data.pluginMessage;
+            
+            if (msg.type === 'copy-to-clipboard') {
+                currentDataUrl = msg.dataUrl;
+                
+                // 기본 상태 메시지 숨기기
+                document.getElementById('status').style.display = 'none';
+                
+                // 노드 정보 박스 표시
+                document.getElementById('nodeInfoBox').innerHTML = `선택된 요소: <span class="node-name">${msg.nodeName}</span>`;
+                document.getElementById('nodeInfoBox').style.display = 'block';
+                
+                // 액션 행 표시 (변환 완료 + 복사 버튼)
+                document.getElementById('actionRow').style.display = 'flex';
+                
+                // 원본 SVG 표시
+                document.getElementById('originalSvg').textContent = msg.originalSvg;
+                
+                // Data URL 표시
+                document.getElementById('dataUrl').textContent = currentDataUrl;
+                
+                // 결과 섹션 표시
+                document.getElementById('results').style.display = 'block';
+                
+            } else if (msg.type === 'no-selection') {
+                document.getElementById('status').innerHTML = '요소를 선택해주세요';
+                document.getElementById('status').className = 'status';
+                document.getElementById('status').style.display = 'block';
+                document.getElementById('results').style.display = 'none';
+                document.getElementById('actionRow').style.display = 'none';
+                document.getElementById('nodeInfoBox').style.display = 'none';
+                
+            } else if (msg.type === 'multiple-selection') {
+                document.getElementById('status').innerHTML = '⚠️ 하나의 요소만 선택해주세요';
+                document.getElementById('status').className = 'status warning';
+                document.getElementById('status').style.display = 'block';
+                document.getElementById('results').style.display = 'none';
+                document.getElementById('actionRow').style.display = 'none';
+                document.getElementById('nodeInfoBox').style.display = 'none';
+                
+            } else if (msg.type === 'error') {
+                document.getElementById('status').innerHTML = `❌ ${msg.message}`;
+                document.getElementById('status').className = 'status error';
+                document.getElementById('status').style.display = 'block';
+                document.getElementById('results').style.display = 'none';
+                document.getElementById('actionRow').style.display = 'none';
+                document.getElementById('nodeInfoBox').style.display = 'none';
+            }
+        };
+        
+        // 클립보드에 복사 (버튼 클릭 시에만 동작)
+        function copyToClipboard() {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(currentDataUrl).then(() => {
+                    document.getElementById('statusInline').innerHTML = '✅ 복사 완료!';
+                }).catch(err => {
+                    copyMethod2();
+                });
+            } else {
+                copyMethod2();
+            }
+        }
+        
+        // 방법 2: execCommand 사용
+        function copyMethod2() {
+            try {
+                const textArea = document.createElement('textarea');
+                textArea.value = currentDataUrl;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                textArea.setSelectionRange(0, 99999);
+                
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                if (successful) {
+                    document.getElementById('statusInline').innerHTML = '✅ 복사 완료!';
+                } else {
+                    copyFailed();
+                }
+            } catch (err) {
+                copyFailed();
+            }
+        }
+        
+        // 복사 실패 처리
+        function copyFailed() {
+            document.getElementById('statusInline').innerHTML = '❌ 복사 실패';
+            
+            // Data URL 자동 선택
+            const dataUrlElement = document.getElementById('dataUrl');
+            setTimeout(() => {
+                selectText(dataUrlElement);
+            }, 500);
+        }
+        
+        // 버튼 이벤트
+        document.getElementById('copyBtn').onclick = copyToClipboard;
+    </script>
+</body>
+</html>
