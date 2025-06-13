@@ -65,28 +65,6 @@ Figma에서 선택한 요소를 SVG로 변환하고, 웹에서 바로 사용할 
 1. **플러그인** → **개발** → **"🔄 SVG → Data URL 변환기"** 선택
 2. 플러그인 창이 열리면 설치 완료!
 
-### 🌐 공개 플러그인 등록 (Figma Community)
-
-#### 1단계: 플러그인 준비
-- [ ] 플러그인 아이콘 준비 (512x512px PNG)
-- [ ] 스크린샷 준비 (1600x1200px 권장)
-- [ ] 플러그인 설명 작성
-- [ ] 테스트 완료
-
-#### 2단계: Figma Community 제출
-1. **Figma Community** (figma.com/community) 접속
-2. **"플러그인 게시"** 선택
-3. **플러그인 정보 입력**:
-   - 이름: "SVG → Data URL 변환기"
-   - 설명: SVG를 Data URL로 변환하는 플러그인
-   - 카테고리: "개발자 도구" 또는 "유틸리티"
-   - 태그: svg, dataurl, 변환, 웹개발
-
-#### 3단계: 검토 및 승인
-- Figma 팀 검토 (보통 1-2주 소요)
-- 승인 후 Community에 공개
-- 사용자들이 설치 및 사용 가능
-
 ## 📂 프로젝트 구조
 
 ```
@@ -116,19 +94,11 @@ FigmaSVGconvertDataURL/
 
 ## 🔄 업데이트 내역
 
-### v1.0.0 (2024)
+### v1.0.0 (2025.06.13)
 - ✅ 기본 SVG → Data URL 변환 기능
 - ✅ 실시간 선택 감지
 - ✅ 클립보드 복사 기능
 - ✅ SVG 코드 최적화
-
-## 🤝 기여하기
-
-1. **Fork** 이 저장소
-2. **Feature branch** 생성 (`git checkout -b feature/새기능`)
-3. **변경사항 커밋** (`git commit -am '새 기능 추가'`)
-4. **브랜치 푸시** (`git push origin feature/새기능`)
-5. **Pull Request** 생성
 
 ## 📄 라이선스
 
